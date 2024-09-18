@@ -1,0 +1,21 @@
+#ignorando algumas pastas
+output/
+.vscode/
+.venv/
+.idea/
+__pycache__/
+
+#ignorando as provas compactadas
+*.tar.gz
+
+#ignorando alguns arquivos
+README
+CG/transition
+CG/transition2
+*.class
+*.pnm
+*.ppm
+*.gif
+*.jpg
+*.zip
+*.HEIC
