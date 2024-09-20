@@ -25,11 +25,14 @@ int somar(int *numero){
 } */
 int main(int argc, char const *argv[])
 {
-
+    int c = 0;
     for (double cont = 0.0; cont < 1.0; cont += 0.01){
-        printf("imagens/transicao%03d.pnm", (int)(cont * 100));
+        printf("imagens/transicao%03d.pnm\n", (int)(cont * 100));
         //printf("%lf\n", cont);
     }
+
+    printf("%03d\n", (int)(0.400000l * 20));
+    printf("%d\n", c);
     return 0;
 }
 /**/

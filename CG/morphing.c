@@ -86,7 +86,7 @@ void morphing_imagem(FILE *fp1, FILE *fp2){
     char nomearquivo[256];
     
     for (cont = 0.0; cont < 1.0; cont += 0.01){
-        sprintf(nomearquivo, "imagens/transicao%03d.pnm", (int)(cont * 100));
+        sprintf(nomearquivo, "imagens/transicao%0.lf.pnm", (cont * 100));
         gravar_imagemOut(nomearquivo);
         for (int lin = 0; lin < nlin; lin++){
             for (int col = 0; col < ncol; col++){

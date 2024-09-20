@@ -85,14 +85,14 @@ void morphing_imagem(FILE *fp1, FILE *fp2){
     double cont;
     char nomearquivo[256];
     
-    for (cont = 0.0; cont < 1.0; cont += 0.05){
-        sprintf(nomearquivo, "imagens2/transicao%03d.pnm", (int)(cont * 20));
+    for (cont = 0.0; cont < 1.0; cont += 0.01){
+        sprintf(nomearquivo, "imagensW/transicao%0.lf.pnm", (cont * 100));
         gravar_imagemOut(nomearquivo);
         for (int lin = 0; lin < nlin; lin++){
             for (int col = 0; col < ncol; col++){
-                fprintf(fpout, "%d ", (int)(imagemR1[lin][col] * (1.0 - cont) + imagemR2[lin][col] * cont));
-                fprintf(fpout, "%d ", (int)(imagemG1[lin][col] * (1.0 - cont) + imagemG2[lin][col] * cont));
-                fprintf(fpout, "%d ", (int)(imagemB1[lin][col] * (1.0 - cont) + imagemB2[lin][col] * cont));
+                fprintf(fpout, "%0.lf ", (imagemR1[lin][col] * (1.0 - cont) + imagemR2[lin][col] * cont));
+                fprintf(fpout, "%0.lf ", (imagemG1[lin][col] * (1.0 - cont) + imagemG2[lin][col] * cont));
+                fprintf(fpout, "%0.lf ", (imagemB1[lin][col] * (1.0 - cont) + imagemB2[lin][col] * cont));
             }
         }
         if (fclose(fpout))
