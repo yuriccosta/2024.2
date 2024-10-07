@@ -1,38 +1,128 @@
-#include <stdio.h>
-/* #include <stdlib.h>
+#include <GL/glut.h>
+#include <math.h>
 
-void ler_imagem1(int ** var){
-    *var = (int **)malloc((5) * sizeof(int *));
-    *var[0] = (int *)malloc((5) * sizeof(int));
-    var[0][0] = 15;
-    printf("Endereço de var: %p\n", &var);
-    printf("Valor de var: %p\n", var);
-    printf("Endereço de var[0]: %p\n", &var[0]);
-    printf("Valor de var[0]: %p\n", var[0]);
-    printf("Valor de var[0][0]: %d\n", var[0][0]);
-    
+void display() {
+    glClear(GL_COLOR_BUFFER_BIT);
+
+    // Draw night sky
+    glBegin(GL_QUADS);
+    glColor3f(0.0, 0.0, 0.2); // Dark blue
+    glVertex2f(-1.0, 1.0);
+    glVertex2f(1.0, 1.0);
+    glVertex2f(1.0, -1.0);
+    glVertex2f(-1.0, -1.0);
+    glEnd();
+
+    // Draw moon
+    glColor3f(1.0, 1.0, 0.8); // Light yellow
+    float moonX = 0.6, moonY = 0.8, moonRadius = 0.1;
+    glBegin(GL_TRIANGLE_FAN);
+    glVertex2f(moonX, moonY);
+    for (int i = 0; i <= 100; i++) {
+        float angle = 2.0f * 3.1415926f * i / 100;
+        float dx = cosf(angle) * moonRadius;
+        float dy = sinf(angle) * moonRadius;
+        glVertex2f(moonX + dx, moonY + dy);
+    }
+    glEnd();
+
+    // Draw river
+    glColor3f(0.0, 0.5, 1.0); // Blue
+    glBegin(GL_QUADS);
+    glVertex2f(-1.0, -0.5);
+    glVertex2f(1.0, -0.5);
+    glVertex2f(1.0, -1.0);
+    glVertex2f(-1.0, -1.0);
+    glEnd();
+
+    // Draw tree trunk
+    glColor3f(0.55, 0.27, 0.07); // Brown
+    glBegin(GL_QUADS);
+    glVertex2f(-0.8, -0.5);
+    glVertex2f(-0.7, -0.5);
+    glVertex2f(-0.7, -0.2);
+    glVertex2f(-0.8, -0.2);
+    glEnd();
+
+    // Draw tree leaves
+    glColor3f(0.0, 0.8, 0.0); // Green
+    glBegin(GL_TRIANGLES);
+    glVertex2f(-0.85, -0.2);
+    glVertex2f(-0.75, 0.1);
+    glVertex2f(-0.65, -0.2);
+    glEnd();
+    glBegin(GL_TRIANGLES);
+    glVertex2f(-0.85, -0.1);
+    glVertex2f(-0.75, 0.2);
+    glVertex2f(-0.65, -0.1);
+    glEnd();
+
+    // Draw vegetation
+    glColor3f(0.0, 0.5, 0.0); // Dark green
+    glBegin(GL_TRIANGLES);
+    glVertex2f(-0.9, -0.5);
+    glVertex2f(-0.85, -0.4);
+    glVertex2f(-0.8, -0.5);
+    glEnd();
+    glBegin(GL_TRIANGLES);
+    glVertex2f(-0.7, -0.5);
+    glVertex2f(-0.65, -0.4);
+    glVertex2f(-0.6, -0.5);
+    glEnd();
+
+
+// Desenha nuvens
+glColor3f(1.0, 1.0, 1.0); // Branco
+
+// Função auxiliar para desenhar um círculo
+void drawCircle(float cx, float cy, float r, int num_segments) {
+    glBegin(GL_TRIANGLE_FAN);
+    glVertex2f(cx, cy);
+    for (int i = 0; i <= num_segments; i++) {
+        float angle = 2.0f * 3.1415926f * i / num_segments;
+        float dx = cosf(angle) * r;
+        float dy = sinf(angle) * r;
+        glVertex2f(cx + dx, cy + dy);
+    }
+    glEnd();
 }
 
-int somar(int *numero){
-    printf("ANTES DO MALLOC: Endereço de numero: %p\n", &numero);
-    printf("ANTES DO MALLOC: Valor de numero: %p\n", numero);
-    numero = malloc(sizeof(int));
-    *numero = 10;
-    printf("Endereço de numero: %p\n", &numero);
-    printf("Valor de numero: %p\n", numero);
-    printf("Valor de numero: %d\n", *numero);
-    return *numero + 1;
-} */
-int main(int argc, char const *argv[])
-{
-    int c = 0;
-    for (double cont = 0.0; cont < 1.0; cont += 0.01){
-        printf("imagens/transicao%03d.pnm\n", (int)(cont * 100));
-        //printf("%lf\n", cont);
-    }
+// Parâmetros da nuvem
+float cloudX = -0.5, cloudY = 0.7;
+float cloudRadius1 = 0.1, cloudRadius2 = 0.12, cloudRadius3 = 0.08;
 
-    printf("%03d\n", (int)(0.400000l * 20));
-    printf("%d\n", c);
+// Desenha círculos sobrepostos para formar a nuvem
+drawCircle(cloudX, cloudY, cloudRadius1, 100);
+drawCircle(cloudX + 0.1, cloudY + 0.05, cloudRadius2, 100);
+drawCircle(cloudX + 0.2, cloudY, cloudRadius1, 100);
+drawCircle(cloudX + 0.15, cloudY - 0.05, cloudRadius3, 100);
+drawCircle(cloudX + 0.05, cloudY - 0.05, cloudRadius3, 100);
+
+// Desenha outra nuvem
+cloudX = -0.4;
+drawCircle(cloudX, cloudY, cloudRadius1, 100);
+drawCircle(cloudX + 0.1, cloudY + 0.05, cloudRadius2, 100);
+drawCircle(cloudX + 0.2, cloudY, cloudRadius1, 100);
+drawCircle(cloudX + 0.15, cloudY - 0.05, cloudRadius3, 100);
+drawCircle(cloudX + 0.05, cloudY - 0.05, cloudRadius3, 100);
+
+    glutSwapBuffers();
+}
+
+void init() {
+    glClearColor(0.0, 0.0, 0.2, 1.0); // Dark blue background
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    gluOrtho2D(-1.0, 1.0, -1.0, 1.0);
+}
+
+int main(int argc, char** argv) {
+    glutInit(&argc, argv);
+    glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
+    glutInitWindowSize(800, 600);
+    glutCreateWindow("2D Night Scene");
+    init();
+    glutDisplayFunc(display);
+    glutMainLoop();
     return 0;
 }
-/**/

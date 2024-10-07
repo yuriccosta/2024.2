@@ -11,6 +11,16 @@ void keyboard(unsigned char key, int x, int y);
 void Special_keyboard(GLint tecla, int x, int y);
 void DesenhaTexto(char *string);
 
+void criarArvore(double x, double y);
+void criaCirculo(double x0, double y0, double raio);
+void criaElipse(double x0, double y0, double raioX, double raioY);
+void criaOctagono(double x0, double y0, double raio);
+void criaEstrelas(int n, int random);
+void criaArvoreMedia(double x, double y);
+void criarArvoreComprida(double x, double y);
+void criaArbusto(double x, double y);
+void criaTieFighter(double x, double y);
+
 int main(int argc, char** argv){
   glutInit(&argc, argv); //Estabelece contato com sistema de janelas
   glutInitDisplayMode (GLUT_SINGLE | GLUT_RGB); //Cores dos pixels serão expressos em RGB
@@ -26,6 +36,189 @@ int main(int argc, char** argv){
   glutMainLoop(); //Depois de registradas as callbacks, o controle é entregue ao sistema de janelas
   printf("\nTestando... \n");
   return 0;
+}
+
+
+void criarArvore(double x, double y){
+  // Tronco
+  glColor3ub(75, 51, 0);
+  glBegin(GL_QUADS);
+    glVertex2d(x, y);
+    glVertex2d(x, y + 1);
+    glVertex2d(x + 0.05, y + 1 );
+    glVertex2d(x + 0.05, y);
+  glEnd();
+
+  // Galhos
+  glLineWidth(2.0);
+  glBegin(GL_LINES);
+    for (int c = 0; c <= 10; c++){
+      glVertex2d((2*x+ 0.05) / 2 , y + 1  - 0.1);
+      glVertex2d(x - 0.5 + c *0.1, y + 1.5);
+    }
+  glEnd();
+
+  // Folhas
+  glColor3ub(33, 40, 15);
+  /* glBegin(GL_POLYGON);
+    glVertex2d(x - 0.5, y + 1.5);
+    glVertex2d(x - 0.25, y + 1.7);
+    glVertex2d(x + 0.25, y + 1.7);
+    glVertex2d(x + 0.5, y + 1.5);
+  glEnd(); */
+
+  criaElipse(x, y + 1.5, 0.5, 0.2);
+  criaElipse(x, y + 1.6, 0.25, 0.4);
+
+
+}
+
+void criaArvoreMedia(double x, double y){
+  // Tronco
+  glColor3ub(75, 51, 0);
+  glBegin(GL_QUADS);
+    glVertex2d(x, y);
+    glVertex2d(x, y + 0.8);
+    glVertex2d(x + 0.1, y + 0.8 );
+    glVertex2d(x + 0.1, y);
+  glEnd();
+
+  // Folhas
+  glColor3ub(33, 40, 15);
+  criaElipse((2 * x + 0.1) / 2, y + 0.8, 0.5, 0.2);
+  criaElipse((2 * x + 0.1) / 2, y + 0.7, 0.6, 0.2);
+}
+
+void criarArvoreComprida(double x, double y){
+    // Tronco
+  glColor3ub(75, 51, 0);
+  glBegin(GL_QUADS);
+    glVertex2d(x, y);
+    glVertex2d(x, y + 0.8);
+    glVertex2d(x + 0.1, y + 0.8 );
+    glVertex2d(x + 0.1, y);
+  glEnd();
+
+  // Folhas
+  glColor3ub(33, 40, 15);
+  criaElipse((2 * x + 0.1) / 2, y + 1.25, 0.2, 0.4);
+  criaElipse((2 * x + 0.1) / 2, y + 1, 0.2, 0.6);
+}
+
+
+void criaCirculo(double x0, double y0, double raio){
+  glBegin(GL_TRIANGLE_FAN);
+      glVertex2d(x0, y0); // Centro do círculo
+      double ang, x, y;
+      for (int i = 0; i <= 100; i++) {
+          ang = 2.0 * M_PI * i / 100; // Ângulo atual
+          x = raio * cos(ang); // Coordenada x
+          y = raio * sin(ang); // Coordenada y
+          glVertex2d(x0 + x, y0 + y);
+      }
+  glEnd();
+}
+
+void criaElipse(double x0, double y0, double raioX, double raioY){
+  glBegin(GL_TRIANGLE_FAN);
+      glVertex2d(x0, y0); // Centro do círculo
+      double ang, x, y;
+      for (int i = 0; i <= 100; i++) {
+          ang = 2.0 * M_PI * i / 100; // Ângulo atual
+          x = raioX * cos(ang); // Coordenada x
+          y = raioY * sin(ang); // Coordenada y
+          glVertex2d(x0 + x, y0 + y);
+      }
+  glEnd();
+}
+
+void criaOctagono(double x0, double y0, double raio){
+  glBegin(GL_TRIANGLE_FAN);
+    glVertex2d(x0, y0);
+    double ang, x, y;
+    for (int i = 0; i <= 8; i++){
+      ang = 2.0 * M_PI * i / 8;
+      x = raio * cos(ang);
+      y = raio * sin(ang);
+      glVertex2d(x0 + x, y0 + y);
+    }
+  glEnd();
+}
+
+
+
+void criaEstrelas(int n, int random){
+  srand(random);
+  glColor3ub(255, 255, 255);
+  glBegin(GL_POINTS);
+    for (int i = 0; i < n; i++){
+      glVertex2d(((double)rand() / RAND_MAX) * 10.0 - 5.0, ((double)rand() / RAND_MAX) * 5.0 + 1.0);
+    }
+  glEnd();
+}
+
+void criaArbusto(double x, double y){
+  glColor3ub(33, 40, 15);
+  glBegin(GL_POLYGON);
+    
+  glEnd();
+}
+
+
+void criaTieFighter(double x, double y){
+
+  // Base
+  glColor3ub(166, 175, 186);
+  criaElipse(x, y + 0.1, 0.6, 0.5);
+  criaElipse(x, y - 0.1, 0.6, 0.5);
+
+  // Aro do vidro
+  glColor3ub(62, 70, 81);
+  criaCirculo(x, y, 0.5);
+  // Vidro grande
+  glColor3ub(15, 36, 50);
+  criaCirculo(x, y, 0.45);
+
+  // Aro do vidro central
+  glColor3ub(62, 70, 81);
+  criaOctagono(x, y, 0.27);
+  // Vidro central
+  glColor3ub(15, 36, 50);
+  criaOctagono(x, y, 0.24);
+
+  // Aros de sustentação do vidro central
+  glColor3ub(62, 70, 81);
+  glBegin(GL_LINES);
+    double ang, x1, y1, x0, y0;
+    for (int i = 0; i <= 8; i++){
+      ang = 2.0 * M_PI * i / 8;
+      x1 = 0.45 * cos(ang);
+      y1 = 0.45 * sin(ang);
+      x0 = 0.24 * cos(ang);
+      y0 = 0.24 * sin(ang);
+      glVertex2d(x + x1, y + y1);
+      glVertex2d(x + x0, y + y0);
+    }
+  glEnd();
+
+  // Asa esquerda
+  glColor3ub(166, 175, 186);
+  glBegin(GL_QUADS);
+    glVertex2d(x - 0.5, y + 0.4);
+    glVertex2d(x - 0.5, y - 0.4);
+    glVertex2d(x - 1.5, y - 0.05);
+    glVertex2d(x - 1.5, y + 0.05);
+  glEnd();
+
+  // Asa direita
+  glColor3ub(166, 175, 186);
+  glBegin(GL_QUADS);
+    glVertex2d(x + 0.5, y + 0.4);
+    glVertex2d(x + 0.5, y - 0.4);
+    glVertex2d(x + 1.5, y - 0.05);
+    glVertex2d(x + 1.5, y + 0.05);
+  glEnd();
+
 }
 
 void display(void){
@@ -47,59 +240,43 @@ void display(void){
     glVertex2d(min, 1);
   glEnd();
 
-  // Cria uma arvóre
-  // Tronco
-  glColor3ub(85, 89, 48);
-  glBegin(GL_QUADS);
-    glVertex2d(-4, -4);
-    glVertex2d(-4, -3);
-    glVertex2d(-3.95, -3);
-    glVertex2d(-3.95, -4);
-  glEnd();
+  //Cria estrelas
+  criaEstrelas(200, 2);
 
-  // Galhos
-  glLineWidth(2.0);
-  glBegin(GL_LINES);
-    for (int c = 0; c <= 10; c++){
-      glVertex2d(-3.975, -3.1);
-      glVertex2d(-4.5 + c *0.1, -2.5);
-    }
-  glEnd();
+  // Cria as arvóres
+  criarArvore(-4,-4);
+  criarArvore(-2,-4);
+  criarArvore(0,-4);
 
-  // Folhas
-  glColor3ub(33, 40, 15);
-  glBegin(GL_POLYGON);
-    glVertex2d(-4.5, -2.5);
-    glVertex2d(-4.25, -2.3);
-    glVertex2d(-3.75, -2.3);
-    glVertex2d(-3.5, -2.5);
-  glEnd();
+  criaArvoreMedia(4, -4);
+  criarArvoreComprida(2, -4);
+
+  // Cria os arbustos
+  criaArbusto(4, -4);
+  
+
 
   // Cria a lua
   glColor3ub(179, 229, 226);
-  glBegin(GL_TRIANGLE_FAN);
-      glVertex2d(-3, 3.5); // Centro do círculo
-      double raio = sqrt(0.5); // Raio do círculo
-      for (int i = 0; i <= 100; i++) {
-          double ang = 2.0 * M_PI * i / 100; // Ângulo atual
-          double x = raio * cos(ang); // Coordenada x
-          double y = raio * sin(ang); // Coordenada y
-          glVertex2d(-3 + x, 3.5 + y); // Adiciona o vértice
-      }
-  glEnd();
+  criaCirculo(-3, 3.5, sqrt(0.5));
 
   // Crateras na lua
-  glColor3ub(59, 93, 120);
-  glBegin(GL_TRIANGLE_FAN);
-      glVertex2d(-3.25, 3.5); // Centro do círculo
-      raio = sqrt(0.01); // Raio do círculo
-      for (int i = 0; i <= 100; i++) {
-          double ang = 2.0 * M_PI * i / 100; // Ângulo atual
-          double x = raio * cos(ang); // Coordenada x
-          double y = raio * sin(ang); // Coordenada y
-          glVertex2d(-3.25 + x, 3.5 + y); // Adiciona o vértice
-      }
-  glEnd();
+  glColor3ub(57, 79, 105);
+  criaCirculo(-3.25, 3.5, 0.1);
+  glColor3ub(71, 94, 113);
+  criaCirculo(-2.5, 3.7, 0.08);
+  glColor3ub(231, 200, 202);
+  criaCirculo(-2.8, 3.2, 0.2);
+
+  //Cria nuvens
+  glColor3ub(115, 134, 129);
+  criaElipse(-3, 1, 0.5, 0.45);
+  criaElipse(-2.5, 1, 0.4, 0.3);
+  criaElipse(-3.5, 1, 0.4, 0.3);
+
+  criaTieFighter(3, 3);
+  
+
 
   //glBegin(GL_QUAD_STRIP);
   //glBegin(GL_TRIANGLES);
