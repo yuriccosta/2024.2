@@ -1,6 +1,7 @@
 #include <GL/glut.h> //O arquivo glut.h inclui, além dos protótipos das funções GLUT, os arquivos gl.h e glu.h,
 #include <stdlib.h>
 #include <stdio.h>
+#include <math.h>
 
 int R = 0, G=0, B = 0;
 GLdouble min = -5, max = 5;
@@ -14,10 +15,10 @@ int main(int argc, char** argv){
   glutInit(&argc, argv); //Estabelece contato com sistema de janelas
   glutInitDisplayMode (GLUT_SINGLE | GLUT_RGB); //Cores dos pixels serão expressos em RGB
   glutInitWindowSize (800, 600); //Estabelece o tamanho (em pixels) da janela a ser criada
-  glutInitWindowPosition (00, 00); //Posição inicial do canto superior esquerdo da janela a ser criada 
+  glutInitWindowPosition (1367, 00); //Posição inicial do canto superior esquerdo da janela a ser criada 
   glutCreateWindow (argv[1]); //Cria uma nova janela com valor de retorno (não usado)
   // que a identifica, caso tenha mais de uma
-  glClearColor(0.0, 0.0, 0.102, 0.0); //selecionar cor de fundo (Branco)
+  glClearColor(0.047, 0.052, 0.061, 0.0); //selecionar cor de fundo (Branco)
   glOrtho (min, max, min, max, min, max); //define as coordenadas +do volume de recorte (clipping volume),
   glutDisplayFunc(display); //Função callback chamada para fazer o desenho
   glutKeyboardFunc(keyboard); //Chamada sempre que uma tecla for precionada
@@ -37,17 +38,18 @@ void display(void){
   //glBegin(GL_LINE_LOOP);
 
   // Cria o terreno
-  glColor3b(50, 102, 40);
+  glColor3ub(67, 79, 23);
   glBegin(GL_QUADS);
     glVertex2d(min, min);
     glVertex2d(max, min);
-    glColor3b(40, 82, 60);
+    glColor3ub(74, 90, 36);
     glVertex2d(max, 1);
     glVertex2d(min, 1);
   glEnd();
 
   // Cria uma arvóre
-  glColor3b(70, 71, 36);
+  // Tronco
+  glColor3ub(85, 89, 48);
   glBegin(GL_QUADS);
     glVertex2d(-4, -4);
     glVertex2d(-4, -3);
@@ -55,23 +57,49 @@ void display(void){
     glVertex2d(-3.95, -4);
   glEnd();
 
+  // Galhos
+  glLineWidth(2.0);
+  glBegin(GL_LINES);
+    for (int c = 0; c <= 10; c++){
+      glVertex2d(-3.975, -3.1);
+      glVertex2d(-4.5 + c *0.1, -2.5);
+    }
+  glEnd();
+
+  // Folhas
+  glColor3ub(33, 40, 15);
+  glBegin(GL_POLYGON);
+    glVertex2d(-4.5, -2.5);
+    glVertex2d(-4.25, -2.3);
+    glVertex2d(-3.75, -2.3);
+    glVertex2d(-3.5, -2.5);
+  glEnd();
+
+  // Cria a lua
+  glColor3ub(179, 229, 226);
   glBegin(GL_TRIANGLE_FAN);
-    glColor3b(54, 75, 20);
-    glVertex2d(-3.975, -3);
-    glVertex2d(-4.025, -3);
-    glVertex2d(-4, -2.5);
-    glVertex2d(-3.975, -2.5);
-    glVertex2d(-3.95, -3);
+      glVertex2d(-3, 3.5); // Centro do círculo
+      double raio = sqrt(0.5); // Raio do círculo
+      for (int i = 0; i <= 100; i++) {
+          double ang = 2.0 * M_PI * i / 100; // Ângulo atual
+          double x = raio * cos(ang); // Coordenada x
+          double y = raio * sin(ang); // Coordenada y
+          glVertex2d(-3 + x, 3.5 + y); // Adiciona o vértice
+      }
   glEnd();
 
-
-  /* Cria o rio
-  glBegin(GL_TRIANGLE_STRIP);
-    glColor3b(62, 101, 126);
-    
+  // Crateras na lua
+  glColor3ub(59, 93, 120);
+  glBegin(GL_TRIANGLE_FAN);
+      glVertex2d(-3.25, 3.5); // Centro do círculo
+      raio = sqrt(0.01); // Raio do círculo
+      for (int i = 0; i <= 100; i++) {
+          double ang = 2.0 * M_PI * i / 100; // Ângulo atual
+          double x = raio * cos(ang); // Coordenada x
+          double y = raio * sin(ang); // Coordenada y
+          glVertex2d(-3.25 + x, 3.5 + y); // Adiciona o vértice
+      }
   glEnd();
-  */
-
 
   //glBegin(GL_QUAD_STRIP);
   //glBegin(GL_TRIANGLES);
