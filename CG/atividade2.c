@@ -220,35 +220,35 @@ void criaTieFighter(double x, double y){
   glColor3ub(62, 70, 81);
   glBegin(GL_QUAD_STRIP);
     // Parte de cima
-    glVertex2d(x - 1, y + 1.5);
     glVertex2d(x - 0.9, y + 1.5);
-    glVertex2d(x - 1.5, y + 1);
-    glVertex2d(x - 1.4, y + 1);
+    glVertex2d(x - 0.8, y + 1.5);
+    glVertex2d(x - 1.45, y + 1);
+    glVertex2d(x - 1.3, y + 1);
 
     // Parte do meio
-    glVertex2d(x - 1.5, y - 1);
-    glVertex2d(x - 1.4, y - 1);
+    glVertex2d(x - 1.45, y - 1);
+    glVertex2d(x - 1.3, y - 1);
 
     // Parte de baixo
-    glVertex2d(x - 1, y - 1.5);
     glVertex2d(x - 0.9, y - 1.5);
+    glVertex2d(x - 0.8, y - 1.5);
   glEnd();
 
   // Asa direita
   glBegin(GL_QUAD_STRIP);
     // Parte de cima
-    glVertex2d(x + 1, y + 1.5);
     glVertex2d(x + 0.9, y + 1.5);
-    glVertex2d(x + 1.5, y + 1);
-    glVertex2d(x + 1.4, y + 1);
+    glVertex2d(x + 0.8, y + 1.5);
+    glVertex2d(x + 1.45, y + 1);
+    glVertex2d(x + 1.3, y + 1);
 
     // Parte do meio
-    glVertex2d(x + 1.5, y - 1);
-    glVertex2d(x + 1.4, y - 1);
+    glVertex2d(x + 1.45, y - 1);
+    glVertex2d(x + 1.3, y - 1);
 
     // Parte de baixo
-    glVertex2d(x + 1, y - 1.5);
     glVertex2d(x + 0.9, y - 1.5);
+    glVertex2d(x + 0.8, y - 1.5);
   glEnd();
 }
 
