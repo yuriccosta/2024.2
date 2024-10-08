@@ -3,6 +3,15 @@
 #include <stdio.h>
 #include <math.h>
 
+#define ALTURA_ARV_MED 0.8
+#define LARGURA_ARV_MED 0.1
+
+#define ALTURA_ARV_COMPRIDA 0.8
+#define LARGURA_ARV_COMPRIDA 0.1
+
+#define RAIO_DO_VID_GRANDE 0.45
+#define RAIO_DO_VID_CENTRAL 0.24
+
 int R = 0, G=0, B = 0;
 GLdouble min = -5, max = 5;
 
@@ -69,23 +78,24 @@ void criarArvore(double x, double y){
 
   criaElipse(x, y + 1.5, 0.5, 0.2);
   criaElipse(x, y + 1.6, 0.25, 0.4);
+
+
 }
 
 void criaArvoreMedia(double x, double y){
   // Tronco
-
   glColor3ub(75, 51, 0);
   glBegin(GL_QUADS);
     glVertex2d(x, y);
-    glVertex2d(x, y + 0.8);
-    glVertex2d(x + 0.1, y + 0.8 );
-    glVertex2d(x + 0.1, y);
+    glVertex2d(x, y + ALTURA_ARV_MED);
+    glVertex2d(x + LARGURA_ARV_MED, y + ALTURA_ARV_MED );
+    glVertex2d(x + LARGURA_ARV_MED, y);
   glEnd();
 
   // Folhas
   glColor3ub(33, 40, 15);
-  criaElipse((2 * x + 0.1) / 2, y + 0.8, 0.5, 0.2);
-  criaElipse((2 * x + 0.1) / 2, y + 0.7, 0.6, 0.2);
+  criaElipse((2 * x + LARGURA_ARV_MED) / 2, y + ALTURA_ARV_MED, 0.5, 0.2);
+  criaElipse((2 * x + LARGURA_ARV_MED) / 2, y + 0.7, 0.6, 0.2);
 }
 
 void criarArvoreComprida(double x, double y){
@@ -93,15 +103,15 @@ void criarArvoreComprida(double x, double y){
   glColor3ub(75, 51, 0);
   glBegin(GL_QUADS);
     glVertex2d(x, y);
-    glVertex2d(x, y + 0.8);
-    glVertex2d(x + 0.1, y + 0.8 );
-    glVertex2d(x + 0.1, y);
+    glVertex2d(x, y + ALTURA_ARV_COMPRIDA);
+    glVertex2d(x + LARGURA_ARV_COMPRIDA, y + ALTURA_ARV_COMPRIDA );
+    glVertex2d(x + LARGURA_ARV_COMPRIDA, y);
   glEnd();
 
   // Folhas
   glColor3ub(33, 40, 15);
-  criaElipse((2 * x + 0.1) / 2, y + 1.25, 0.2, 0.4);
-  criaElipse((2 * x + 0.1) / 2, y + 1, 0.2, 0.6);
+  criaElipse((2 * x + LARGURA_ARV_COMPRIDA) / 2, y + 1.25, 0.2, 0.4);
+  criaElipse((2 * x + LARGURA_ARV_COMPRIDA) / 2, y + 1, 0.2, 0.6);
 }
 
 
@@ -144,6 +154,8 @@ void criaOctagono(double x0, double y0, double raio){
   glEnd();
 }
 
+
+
 void criaEstrelas(int n, int random){
   srand(random);
   glColor3ub(255, 255, 255);
@@ -174,14 +186,14 @@ void criaTieFighter(double x, double y){
   criaCirculo(x, y, 0.5);
   // Vidro grande
   glColor3ub(15, 36, 50);
-  criaCirculo(x, y, 0.45);
+  criaCirculo(x, y, RAIO_DO_VID_GRANDE);
 
   // Aro do vidro central
   glColor3ub(62, 70, 81);
   criaOctagono(x, y, 0.27);
   // Vidro central
   glColor3ub(15, 36, 50);
-  criaOctagono(x, y, 0.24);
+  criaOctagono(x, y, RAIO_DO_VID_CENTRAL);
 
   // Aros de sustentação do vidro central
   glColor3ub(62, 70, 81);
@@ -189,14 +201,19 @@ void criaTieFighter(double x, double y){
     double ang, x1, y1, x0, y0;
     for (int i = 0; i <= 8; i++){
       ang = 2.0 * M_PI * i / 8;
-      x1 = 0.45 * cos(ang);
-      y1 = 0.45 * sin(ang);
-      x0 = 0.24 * cos(ang);
-      y0 = 0.24 * sin(ang);
+      x1 = RAIO_DO_VID_GRANDE * cos(ang);
+      y1 = RAIO_DO_VID_GRANDE * sin(ang);
+      x0 = RAIO_DO_VID_CENTRAL * cos(ang);
+      y0 = RAIO_DO_VID_CENTRAL * sin(ang);
       glVertex2d(x + x1, y + y1);
       glVertex2d(x + x0, y + y0);
     }
   glEnd();
+
+  // Canhão
+  glColor3ub(151, 54, 53);
+  criaCirculo(x + 0.2 ,y - 0.52, 0.045);
+  criaCirculo(x - 0.2 ,y - 0.52, 0.045);
 
   // Base da asa esquerda
   glColor3ub(166, 175, 186);
