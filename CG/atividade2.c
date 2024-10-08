@@ -69,12 +69,11 @@ void criarArvore(double x, double y){
 
   criaElipse(x, y + 1.5, 0.5, 0.2);
   criaElipse(x, y + 1.6, 0.25, 0.4);
-
-
 }
 
 void criaArvoreMedia(double x, double y){
   // Tronco
+
   glColor3ub(75, 51, 0);
   glBegin(GL_QUADS);
     glVertex2d(x, y);
@@ -145,8 +144,6 @@ void criaOctagono(double x0, double y0, double raio){
   glEnd();
 }
 
-
-
 void criaEstrelas(int n, int random){
   srand(random);
   glColor3ub(255, 255, 255);
@@ -201,7 +198,7 @@ void criaTieFighter(double x, double y){
     }
   glEnd();
 
-  // Asa esquerda
+  // Base da asa esquerda
   glColor3ub(166, 175, 186);
   glBegin(GL_QUADS);
     glVertex2d(x - 0.5, y + 0.4);
@@ -210,7 +207,7 @@ void criaTieFighter(double x, double y){
     glVertex2d(x - 1.5, y + 0.05);
   glEnd();
 
-  // Asa direita
+  // Base da asa direita
   glColor3ub(166, 175, 186);
   glBegin(GL_QUADS);
     glVertex2d(x + 0.5, y + 0.4);
@@ -219,6 +216,40 @@ void criaTieFighter(double x, double y){
     glVertex2d(x + 1.5, y + 0.05);
   glEnd();
 
+  // Asa esquerda
+  glColor3ub(62, 70, 81);
+  glBegin(GL_QUAD_STRIP);
+    // Parte de cima
+    glVertex2d(x - 1, y + 1.5);
+    glVertex2d(x - 0.9, y + 1.5);
+    glVertex2d(x - 1.5, y + 1);
+    glVertex2d(x - 1.4, y + 1);
+
+    // Parte do meio
+    glVertex2d(x - 1.5, y - 1);
+    glVertex2d(x - 1.4, y - 1);
+
+    // Parte de baixo
+    glVertex2d(x - 1, y - 1.5);
+    glVertex2d(x - 0.9, y - 1.5);
+  glEnd();
+
+  // Asa direita
+  glBegin(GL_QUAD_STRIP);
+    // Parte de cima
+    glVertex2d(x + 1, y + 1.5);
+    glVertex2d(x + 0.9, y + 1.5);
+    glVertex2d(x + 1.5, y + 1);
+    glVertex2d(x + 1.4, y + 1);
+
+    // Parte do meio
+    glVertex2d(x + 1.5, y - 1);
+    glVertex2d(x + 1.4, y - 1);
+
+    // Parte de baixo
+    glVertex2d(x + 1, y - 1.5);
+    glVertex2d(x + 0.9, y - 1.5);
+  glEnd();
 }
 
 void display(void){
