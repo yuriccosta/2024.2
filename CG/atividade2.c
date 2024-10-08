@@ -9,8 +9,8 @@
 #define ALTURA_ARV_COMPRIDA 0.8
 #define LARGURA_ARV_COMPRIDA 0.1
 
-#define RAIO_DO_VID_GRANDE 0.45
-#define RAIO_DO_VID_CENTRAL 0.24
+#define RAIO_DO_VID_GRANDE 0.42
+#define RAIO_DO_VID_CENTRAL 0.19
 
 int R = 0, G=0, B = 0;
 GLdouble min = -5, max = 5;
@@ -66,6 +66,7 @@ void criarArvore(double x, double y){
       glVertex2d(x - 0.5 + c *0.1, y + 1.5);
     }
   glEnd();
+  glLineWidth(1.0);
 
   // Folhas
   glColor3ub(33, 40, 15);
@@ -141,6 +142,19 @@ void criaElipse(double x0, double y0, double raioX, double raioY){
   glEnd();
 }
 
+void criaSemiElipse(double x0, double y0, double raioX, double raioY){
+  glBegin(GL_TRIANGLE_FAN);
+      glVertex2d(x0, y0); // Centro do círculo
+      double ang, x, y;
+      for (int i = 0; i <= 50; i++) {
+          ang = 2.0 * M_PI * i / 100; // Ângulo atual
+          x = raioX * cos(ang); // Coordenada x
+          y = raioY * sin(ang); // Coordenada y
+          glVertex2d(x0 + x, y0 + y);
+      }
+  glEnd();
+}
+
 void criaOctagono(double x0, double y0, double raio){
   glBegin(GL_TRIANGLE_FAN);
     glVertex2d(x0, y0);
@@ -175,45 +189,13 @@ void criaArbusto(double x, double y){
 
 
 void criaTieFighter(double x, double y){
+  double ang, x1, y1, x0, y0;
+
 
   // Base
   glColor3ub(166, 175, 186);
-  criaElipse(x, y + 0.1, 0.6, 0.5);
-  criaElipse(x, y - 0.1, 0.6, 0.5);
-
-  // Aro do vidro
-  glColor3ub(62, 70, 81);
-  criaCirculo(x, y, 0.5);
-  // Vidro grande
-  glColor3ub(15, 36, 50);
-  criaCirculo(x, y, RAIO_DO_VID_GRANDE);
-
-  // Aro do vidro central
-  glColor3ub(62, 70, 81);
-  criaOctagono(x, y, 0.27);
-  // Vidro central
-  glColor3ub(15, 36, 50);
-  criaOctagono(x, y, RAIO_DO_VID_CENTRAL);
-
-  // Aros de sustentação do vidro central
-  glColor3ub(62, 70, 81);
-  glBegin(GL_LINES);
-    double ang, x1, y1, x0, y0;
-    for (int i = 0; i <= 8; i++){
-      ang = 2.0 * M_PI * i / 8;
-      x1 = RAIO_DO_VID_GRANDE * cos(ang);
-      y1 = RAIO_DO_VID_GRANDE * sin(ang);
-      x0 = RAIO_DO_VID_CENTRAL * cos(ang);
-      y0 = RAIO_DO_VID_CENTRAL * sin(ang);
-      glVertex2d(x + x1, y + y1);
-      glVertex2d(x + x0, y + y0);
-    }
-  glEnd();
-
-  // Canhão
-  glColor3ub(151, 54, 53);
-  criaCirculo(x + 0.2 ,y - 0.52, 0.045);
-  criaCirculo(x - 0.2 ,y - 0.52, 0.045);
+  criaElipse(x, y + 0.1, 0.6, 0.55);
+  criaElipse(x, y - 0.1, 0.6, 0.55);
 
   // Base da asa esquerda
   glColor3ub(166, 175, 186);
@@ -223,6 +205,14 @@ void criaTieFighter(double x, double y){
     glVertex2d(x - 1.5, y - 0.05);
     glVertex2d(x - 1.5, y + 0.05);
   glEnd();
+  // Detalhe da asa esquerda
+  glColor3ub(76, 80, 86);
+  glBegin(GL_QUADS);
+    glVertex2d(x - 0.7, y + 0.1);
+    glVertex2d(x - 0.7, y - 0.1);
+    glVertex2d(x - 1, y - 0.05);
+    glVertex2d(x - 1, y + 0.05);
+  glEnd();
 
   // Base da asa direita
   glColor3ub(166, 175, 186);
@@ -231,6 +221,14 @@ void criaTieFighter(double x, double y){
     glVertex2d(x + 0.5, y - 0.4);
     glVertex2d(x + 1.5, y - 0.05);
     glVertex2d(x + 1.5, y + 0.05);
+  glEnd();
+  // Detalhe da asa direita
+  glColor3ub(76, 80, 86);
+  glBegin(GL_QUADS);
+    glVertex2d(x + 0.7, y + 0.1);
+    glVertex2d(x + 0.7, y - 0.1);
+    glVertex2d(x + 1, y - 0.05);
+    glVertex2d(x + 1, y + 0.05);
   glEnd();
 
   // Asa esquerda
@@ -267,6 +265,65 @@ void criaTieFighter(double x, double y){
     glVertex2d(x + 0.9, y - 1.5);
     glVertex2d(x + 0.8, y - 1.5);
   glEnd();
+
+  // Detalhe da base
+  glColor3ub(76, 80, 86);
+  glBegin(GL_LINES);
+    glBegin(GL_LINES);
+    for (int i = 0; i <= 10; i++){
+      ang = 2.0 * M_PI * i / 10;
+      x1 = 0.60 * cos(ang);
+      y1 = 0.65 * sin(ang);
+      glVertex2d(x + x1, y + y1);
+      glVertex2d(x , y);
+    }
+  glEnd();
+
+  // Aro do vidro
+  glColor3ub(62, 70, 81);
+  criaCirculo(x, y, 0.47);
+  // Vidro grande
+  glColor3ub(15, 36, 50);
+  criaCirculo(x, y, RAIO_DO_VID_GRANDE);
+
+  // Aro do vidro central
+  glColor3ub(62, 70, 81);
+  criaOctagono(x, y, 0.22);
+  // Vidro central
+  glColor3ub(15, 36, 50);
+  criaOctagono(x, y, RAIO_DO_VID_CENTRAL);
+
+  glLineWidth(2.0);
+  // Aros de sustentação do vidro central
+  glColor3ub(62, 70, 81);
+  glBegin(GL_LINES);
+    for (int i = 0; i <= 8; i++){
+      ang = 2.0 * M_PI * i / 8;
+      x1 = RAIO_DO_VID_GRANDE * cos(ang);
+      y1 = RAIO_DO_VID_GRANDE * sin(ang);
+      x0 = RAIO_DO_VID_CENTRAL * cos(ang);
+      y0 = RAIO_DO_VID_CENTRAL * sin(ang);
+      glVertex2d(x + x1, y + y1);
+      glVertex2d(x + x0, y + y0);
+    }
+  glEnd();
+  glLineWidth(1.0);
+
+  // Canhão
+  glColor3ub(151, 54, 53);
+  criaCirculo(x + 0.25 ,y - 0.5, 0.045);
+  criaCirculo(x - 0.25 ,y - 0.5, 0.045);
+
+  // Escotilha
+  glColor3ub(166, 175, 186);
+  criaSemiElipse(x, y + 0.5, 0.4, 0.15);
+  glColor3ub(76, 80, 86);
+  glBegin(GL_LINES);
+    glVertex2d(x - 0.4, y + 0.5);
+    glVertex2d(x + 0.4, y + 0.5);
+  glEnd();
+  criaSemiElipse(x, y + 0.53, 0.3, 0.1);
+
 }
 
 void display(void){
