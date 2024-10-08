@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
+#include <time.h>
 
 #define ALTURA_ARV_MED 0.8
 #define LARGURA_ARV_MED 0.1
@@ -12,22 +13,23 @@
 #define RAIO_DO_VID_GRANDE 0.42
 #define RAIO_DO_VID_CENTRAL 0.19
 
-int R = 0, G=0, B = 0;
+#define DISTANCIA_ESQUERDA_DA_BASE 1.5
+#define DISTANCIA_DIREITA_DA_BASE 0.5
+
 GLdouble min = -5, max = 5;
 
 void display(void);
-void keyboard(unsigned char key, int x, int y);
-void Special_keyboard(GLint tecla, int x, int y);
-void DesenhaTexto(char *string);
 
-void criarArvore(double x, double y);
+void criarArvore(double x, double y, double altura);
 void criaCirculo(double x0, double y0, double raio);
 void criaElipse(double x0, double y0, double raioX, double raioY);
 void criaOctagono(double x0, double y0, double raio);
 void criaEstrelas(int n, int random);
 void criaArvoreMedia(double x, double y);
 void criarArvoreComprida(double x, double y);
-void criaArbusto(double x, double y);
+void criaArbusto(double x, double y, double raio);
+void criaNuvem(double x0,double y0, double raioX, double raioY);
+void criaRio(double x0, double y0, double limx, double limy, int seed, int type);
 void criaTieFighter(double x, double y);
 
 int main(int argc, char** argv){
@@ -40,21 +42,19 @@ int main(int argc, char** argv){
   glClearColor(0.047, 0.052, 0.061, 0.0); //selecionar cor de fundo (Branco)
   glOrtho (min, max, min, max, min, max); //define as coordenadas +do volume de recorte (clipping volume),
   glutDisplayFunc(display); //Função callback chamada para fazer o desenho
-  glutKeyboardFunc(keyboard); //Chamada sempre que uma tecla for precionada
-  glutSpecialFunc(Special_keyboard); // Registra a função para tratamento das teclas NÂO ASCII
   glutMainLoop(); //Depois de registradas as callbacks, o controle é entregue ao sistema de janelas
   printf("\nTestando... \n");
   return 0;
 }
 
 
-void criarArvore(double x, double y){
+void criarArvore(double x, double y, double altura){
   // Tronco
   glColor3ub(75, 51, 0);
   glBegin(GL_QUADS);
     glVertex2d(x, y);
-    glVertex2d(x, y + 1);
-    glVertex2d(x + 0.05, y + 1 );
+    glVertex2d(x, y + altura);
+    glVertex2d(x + 0.05, y + altura );
     glVertex2d(x + 0.05, y);
   glEnd();
 
@@ -62,8 +62,8 @@ void criarArvore(double x, double y){
   glLineWidth(2.0);
   glBegin(GL_LINES);
     for (int c = 0; c <= 10; c++){
-      glVertex2d((2*x+ 0.05) / 2 , y + 1  - 0.1);
-      glVertex2d(x - 0.5 + c *0.1, y + 1.5);
+      glVertex2d((2*x+ 0.05) / 2 , y + altura  - 0.1);
+      glVertex2d(x - 0.5 + c *0.1, y + altura + 0.5);
     }
   glEnd();
   glLineWidth(1.0);
@@ -77,8 +77,8 @@ void criarArvore(double x, double y){
     glVertex2d(x + 0.5, y + 1.5);
   glEnd(); */
 
-  criaElipse(x, y + 1.5, 0.5, 0.2);
-  criaElipse(x, y + 1.6, 0.25, 0.4);
+  criaElipse(x, y + altura + 0.5, 0.5, 0.2);
+  criaElipse(x, y + altura + 0.6, 0.25, 0.4);
 
 
 }
@@ -175,22 +175,64 @@ void criaEstrelas(int n, int random){
   glColor3ub(255, 255, 255);
   glBegin(GL_POINTS);
     for (int i = 0; i < n; i++){
-      glVertex2d(((double)rand() / RAND_MAX) * 10.0 - 5.0, ((double)rand() / RAND_MAX) * 5.0 + 1.0);
+      glVertex2d(((double)rand() / RAND_MAX) * 10.0 - 5.0, ((double)rand() / RAND_MAX) * 5.0);
     }
   glEnd();
 }
 
-void criaArbusto(double x, double y){
+void criaArbusto(double x, double y, double raio){
+  double ang, x0, y0;
   glColor3ub(33, 40, 15);
-  glBegin(GL_POLYGON);
-    
+  glBegin(GL_LINES);
+    for (int i = 0; i <= 25; i++){
+      ang = 2.0 * M_PI * i / 50;
+      x0 =  raio * cos(ang);
+      y0 = raio * sin(ang);
+      glVertex2d(x + x0, y + y0);
+      glVertex2d(x , y);
+    }
   glEnd();
+}
+
+void criaRio(double x0, double y0, double limx, double limy, int seed, int type){
+  srand(seed);
+  if (type == 1){
+    glBegin(GL_QUAD_STRIP);
+      double x = x0, y = y0, randx, randy;
+      while (1){
+        if (x < limx || y > limy){
+          break;
+        }
+        randx = (double) rand() / RAND_MAX * 0.5;
+        randy = (double) rand() / RAND_MAX * 0.5;
+        glVertex2d(x, y);
+        glVertex2d(x - randx, y + randy);
+        x -= randx;
+        y += randy;
+      }
+    glEnd();
+
+  } else{
+    glBegin(GL_QUAD_STRIP);
+      double x = x0, y = y0, randx, randy;
+      while (1){
+        if (x > limx || y > limy){
+          break;
+        }
+        randx = (double) rand() / RAND_MAX * 0.5;
+        randy = (double) rand() / RAND_MAX * 0.5;
+        glVertex2d(x, y);
+        glVertex2d(x + randx, y + randy);
+        x += randx;
+        y += randy;
+      }
+    glEnd();
+  }
 }
 
 
 void criaTieFighter(double x, double y){
   double ang, x1, y1, x0, y0;
-
 
   // Base
   glColor3ub(166, 175, 186);
@@ -200,12 +242,12 @@ void criaTieFighter(double x, double y){
   // Base da asa esquerda
   glColor3ub(166, 175, 186);
   glBegin(GL_QUADS);
-    glVertex2d(x - 0.5, y + 0.4);
-    glVertex2d(x - 0.5, y - 0.4);
-    glVertex2d(x - 1.5, y - 0.05);
-    glVertex2d(x - 1.5, y + 0.05);
+    glVertex2d(x - DISTANCIA_DIREITA_DA_BASE, y + 0.4);
+    glVertex2d(x - DISTANCIA_DIREITA_DA_BASE, y - 0.4);
+    glVertex2d(x - DISTANCIA_ESQUERDA_DA_BASE, y - 0.05);
+    glVertex2d(x - DISTANCIA_ESQUERDA_DA_BASE, y + 0.05);
   glEnd();
-  // Detalhe da asa esquerda
+  // Detalhe da base da asa esquerda
   glColor3ub(76, 80, 86);
   glBegin(GL_QUADS);
     glVertex2d(x - 0.7, y + 0.1);
@@ -213,22 +255,37 @@ void criaTieFighter(double x, double y){
     glVertex2d(x - 1, y - 0.05);
     glVertex2d(x - 1, y + 0.05);
   glEnd();
+  // Linha da asa esquerda
+  glBegin(GL_LINES);
+    glVertex2d(x - 0.5, y + 0.3);
+    glVertex2d(x - 1.4, y );
+    glVertex2d(x - 0.5, y - 0.3);
+    glVertex2d(x - 1.4, y );
+  glEnd();
 
   // Base da asa direita
   glColor3ub(166, 175, 186);
   glBegin(GL_QUADS);
     glVertex2d(x + 0.5, y + 0.4);
     glVertex2d(x + 0.5, y - 0.4);
+    glColor3ub(166, 175, 186);
     glVertex2d(x + 1.5, y - 0.05);
     glVertex2d(x + 1.5, y + 0.05);
   glEnd();
-  // Detalhe da asa direita
+  // Detalhe da base da asa direita
   glColor3ub(76, 80, 86);
   glBegin(GL_QUADS);
     glVertex2d(x + 0.7, y + 0.1);
     glVertex2d(x + 0.7, y - 0.1);
     glVertex2d(x + 1, y - 0.05);
     glVertex2d(x + 1, y + 0.05);
+  glEnd();
+  // Linha da asa direita
+  glBegin(GL_LINES);
+    glVertex2d(x + 0.5, y + 0.3);
+    glVertex2d(x + 1.4, y );
+    glVertex2d(x + 0.5, y - 0.3);
+    glVertex2d(x + 1.4, y );
   glEnd();
 
   // Asa esquerda
@@ -237,12 +294,12 @@ void criaTieFighter(double x, double y){
     // Parte de cima
     glVertex2d(x - 0.9, y + 1.5);
     glVertex2d(x - 0.8, y + 1.5);
-    glVertex2d(x - 1.45, y + 1);
-    glVertex2d(x - 1.3, y + 1);
+    glVertex2d(x - 1.45, y + 0.5);
+    glVertex2d(x - 1.3, y + 0.5);
 
     // Parte do meio
-    glVertex2d(x - 1.45, y - 1);
-    glVertex2d(x - 1.3, y - 1);
+    glVertex2d(x - 1.45, y - 0.5);
+    glVertex2d(x - 1.3, y - 0.5);
 
     // Parte de baixo
     glVertex2d(x - 0.9, y - 1.5);
@@ -254,12 +311,12 @@ void criaTieFighter(double x, double y){
     // Parte de cima
     glVertex2d(x + 0.9, y + 1.5);
     glVertex2d(x + 0.8, y + 1.5);
-    glVertex2d(x + 1.45, y + 1);
-    glVertex2d(x + 1.3, y + 1);
+    glVertex2d(x + 1.45, y + 0.5);
+    glVertex2d(x + 1.3, y + 0.5);
 
     // Parte do meio
-    glVertex2d(x + 1.45, y - 1);
-    glVertex2d(x + 1.3, y - 1);
+    glVertex2d(x + 1.45, y - 0.5);
+    glVertex2d(x + 1.3, y - 0.5);
 
     // Parte de baixo
     glVertex2d(x + 0.9, y - 1.5);
@@ -326,119 +383,101 @@ void criaTieFighter(double x, double y){
 
 }
 
+void criaNuvem(double x0,double y0, double raioX, double raioY){
+  criaElipse(x0, y0, raioX, raioY);
+  criaElipse(x0 - 0.5, y0, raioX - 0.1, raioY - 0.15);
+  criaElipse(x0 + 0.5, y0, raioX - 0.1, raioY - 0.15);
+}
+
 void display(void){
   glClear(GL_COLOR_BUFFER_BIT); ////Limpa a janela de visualização com a cor de fundo especificada
-  //DesenhaTexto("Exemplo de texto para a atividade 2");
-
-  //glBegin(GL_POINTS);
-  //glBegin(GL_LINES);
-  //glBegin(GL_LINE_STRIP);
-  //glBegin(GL_LINE_LOOP);
 
   // Cria o terreno
-  glColor3ub(67, 79, 23);
+  glColor3ub(57, 69, 13);
   glBegin(GL_QUADS);
-    glVertex2d(min, min);
     glVertex2d(max, min);
-    glColor3ub(74, 90, 36);
-    glVertex2d(max, 1);
-    glVertex2d(min, 1);
+    glColor3ub(77, 89, 33);
+    glVertex2d(min, min);
+    glColor3ub(57, 69, 13);
+    glVertex2d(min, 0);
+    glColor3ub(37, 39, 0);
+    glVertex2d(max, 0);
   glEnd();
 
   //Cria estrelas
   criaEstrelas(200, 2);
 
+  //Cria rio
+  glColor3ub(105, 149, 172);
+  criaRio(5, -5, 0, 0, 10, 1);
+  criaRio(5, -5, 0, 0, 3, 1);
+  criaRio(2, -5 , 4, -4, 5, 2);
+
+
   // Cria as arvóres
-  criarArvore(-4,-4);
-  criarArvore(-2,-4);
-  criarArvore(0,-4);
+  criarArvore(-4, -4.5, 1);
+  criarArvore(-3, -3.2, 0.5);
+  criarArvore(-2, -4.2, 0.8);
+  criarArvore(4.8, -1, 0.4);
 
-  criaArvoreMedia(4, -4);
-  criarArvoreComprida(2, -4);
+  criaArvoreMedia(-1, -4);
+  criaArvoreMedia(0, -3.4);
 
-  // Cria os arbustos
-  criaArbusto(4, -4);
+  criarArvoreComprida(1, -4);
+  criarArvoreComprida(2, -2.8);
   
+  
+  // Cria os arbustos
+  criaArbusto(-3.5, -1.5, 0.3);
+  criaArbusto(2, -4, 0.25);
+  criaArbusto(3, -3.5, 0.2);
+  criaArbusto(-2.5, -3.4, 0.2);  
+  criaArbusto(1.5, -3.8, 0.1);   
+  criaArbusto(3.5, -3.0, 0.25);  
+  criaArbusto(4.0, -3.5, 0.2);
 
 
   // Cria a lua
-  glColor3ub(179, 229, 226);
+  glColor3ub(190, 242, 236);
   criaCirculo(-3, 3.5, sqrt(0.5));
-
   // Crateras na lua
   glColor3ub(57, 79, 105);
-  criaCirculo(-3.25, 3.5, 0.1);
+  criaElipse(-3.25, 3.8, 0.2, 0.08);
   glColor3ub(71, 94, 113);
-  criaCirculo(-2.5, 3.7, 0.08);
-  glColor3ub(231, 200, 202);
-  criaCirculo(-2.8, 3.2, 0.2);
+  criaElipse(-3.45, 3.6, 0.2, 0.1);
+  glColor3ub(57, 82, 110);
+  criaElipse(-3.3, 3.3, 0.2, 0.3);
+  criaElipse(-2.8, 3.4, 0.4, 0.2);
+  // Preenche as crateras
+  glColor3ub(190, 242, 236);
+  glBegin(GL_TRIANGLE_FAN);
+    glVertex2d(-3, 4);
+    glVertex2d(-2.5, 3.7);
+    glVertex2d(-2.5, 3.4);
+  glEnd();
+  criaElipse(-3.1, 3.8, 0.2, 0.09);
+  criaElipse(-3.6, 3.6, 0.1, 0.1);
+  criaSemiElipse(-3.3, 3.3, 0.4, 0.3);
+  criaCirculo(-3, 3.3, 0.3);
 
-  //Cria nuvens
+
+   //Cria nuvens
   glColor3ub(115, 134, 129);
-  criaElipse(-3, 1, 0.5, 0.45);
-  criaElipse(-2.5, 1, 0.4, 0.3);
-  criaElipse(-3.5, 1, 0.4, 0.3);
+  criaNuvem(-0.8, 1.4, 0.5, 0.3);
+  criaNuvem(-4, 1, 0.5, 0.45);
+  criaNuvem(2.8, 0.5, 0.4, 0.3);
+
+  //Cria um planalto
+  glColor3ub(100,32,25);
+  glBegin(GL_QUADS);
+    glVertex2d(-1, 1);
+    glVertex2d(-2, 1);
+    glColor3ub(80,22,15);
+    glVertex2d(-2.5, -0.3);
+    glVertex2d(0.9, -0.3);
+  glEnd();
 
   criaTieFighter(3, 3);
   
-
-
-  //glBegin(GL_QUAD_STRIP);
-  //glBegin(GL_TRIANGLES);
-  //glBegin(GL_TRIANGLE_STRIP);
-  //glBegin(GL_TRIANGLE_FAN);
-  /*glBegin(GL_POLYGON); // toda função começa com um begin
-     glColor3ub (R, G, B); // função que muda a cor
-    glVertex2f(-1,0.0); // criar um ponto
-    glColor3ub (100,100, 100);
-    glVertex2f(-1,1);
-    glColor3ub (200,200, 200);
-    glVertex2f(1,1);
-    glColor3ub (255, 255, 255);
-    glVertex2f(1,0);
-  glEnd(); // termina com um end
-
-  glBegin(GL_POINT);
-    glPointSize(40.0f);
-    glColor3ub (255, 0, 255);
-    glVertex2f(-0.5,0.5);
-  glEnd(); */
-
-
-
   glFlush(); ////Executa os comandos OpenGL para renderização
-}
-
-void keyboard(unsigned char key, int x, int y){
-  printf("*** Tratamento de teclas comuns\n");
-	printf(">>> Tecla pressionada: %c\n",key);
-  switch (key) {
-    case 27: exit(0);
-    case 32: R = 0; G = 0; B = 0;
-            glutPostRedisplay();
-    break;
-  }
-}
-
-void Special_keyboard(GLint tecla, int x, int y) {
-  switch (tecla) { // GLUT_KEY_RIGHT GLUT_KEY_DOWN GLUT_KEY_PAGE_UP GLUT_KEY_PAGE_DOWN GLUT_KEY_F1...
-    case GLUT_KEY_F12: R = 0; G = 200; B = 200;
-        glutPostRedisplay();
-         break;
-    case GLUT_KEY_F10: R = 0; G = 100; B = 200;
-     glutPostRedisplay();
-      break;
-  }
-}
-
-void DesenhaTexto(char *string) {
-  	glColor3ub(150,200,250);
-  	glPushMatrix();
-        // Posição no universo onde o texto será colocado
-        glRasterPos2f(-0.4,-0.4);
-        // Exibe caracter a caracter
-        while(*string)
-             glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24,*string++);
-	glPopMatrix();
-	glColor3ub(255,255,255);
 }
