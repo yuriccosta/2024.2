@@ -3,7 +3,6 @@
 #include <stdio.h>
 #include <math.h>
 #include <time.h>
-#include <unistd.h>
 
 #define ALTURA_ARV_MED 0.8
 #define LARGURA_ARV_MED 0.1
@@ -18,15 +17,12 @@
 #define DISTANCIA_DIREITA_DA_BASE 0.5
 
 GLdouble min = -5, max = 5;
-GLdouble xpos = 3, ypos = 3, scale = 0.8;
+GLdouble xpos = 0, ypos = 0, scale = 0.8;
 GLdouble cotovelo = 90, munheca = -90, mao = 90, garra = 10;
 GLshort send = 0;
-GLdouble xtarget = 0, ytarget = -2, lastX = 0, xdeslocBomb = 0, ydeslocBomb = 0;
+GLdouble xtarget = 0, lastX = 0, xdeslocBomb = 0, ydeslocBomb = 0;
 GLdouble xini, yini;
-GLdouble scaleBB8 = 0.5;
-double speedX = 0.0;
-double launchTime;
-GLshort paused = 0;
+clock_t launchTime;
 
 void display(void);
 void keyboard(unsigned char key, int x, int y);
@@ -807,121 +803,60 @@ void criaBB8(){
 }
 
 void sendProjectile(){
-  // Gera Pokébola
-  glColor3ub(170, 0, 0); 
-  criaCirculo(0, 0, 0.3);
-  glColor3ub(0, 0, 0);
-
-  // Detalhes de Baixo da Pokébola
-  glPushMatrix();
-    glTranslated(0, 0, 0);
-    glRotated(180, 0, 0, 1);
-    glColor3ub(255, 255, 255);
-    criaSemiElipse(0, 0, 0.3, 0.3);
-  glPopMatrix();
-
-  //Detalhes do Centro da Pokébola
-  glColor3ub(0,0,0);
-  criaCirculo(0, 0, 0.1);
-  glColor3ub(255, 255, 255);
-  criaCirculo(0, 0, 0.07);
-  glColor3ub(0,0,0);
-  criaCirculo(0, 0, 0.05);
-  glColor3ub(255, 255, 255);
-  criaCirculo(0, 0, 0.04);
+  // Gera bomba
+  glColor3ub(169, 169, 169); 
+  criaCirculo(0, -0.9, 0.3);
+  //send = 0; // Reseta a variável de controle
 }
 
-void Animar(int interacoes) {
-    // Não atualiza os frames até despausar;
-    if (paused) {
-        // Quer dizer que acertamos o alvo e pausamos, portanto resetamos o estado
-        send = 0;
-        glutTimerFunc(30, Animar, interacoes); // Reagendar apenas para verificar pausa
-        return;
-    }
-    double gravity = 9.81; // Gravidade
-    double currentTime = glutGet(GLUT_ELAPSED_TIME) / 1000.0f;
-    double timeElapsed = ((currentTime - launchTime));
-    
-    // Verifica se mudamos de posição a cada 5 frames, se sim estamos em movimento
-    if (fmod(interacoes, 5) == 0) {
-      // Verificamos se o alvo já esta em lançamento
-      if (send == 0){
-        // Se o alvo não esta sendo lançado salvamos a ultima posição da nave em X e a velocidade para a direita ou esquerda, ou 0 se parado
-        if (xpos > lastX){
-          lastX = xpos;
-          speedX = 2;
-        } else if (xpos < lastX){
-          lastX = xpos;
-          speedX = -2;
-        } else{
-          speedX = 0;
-        }
-      }
-    }
+void Animar(int interacoes) { // Fun��o de anima��o chamada pela TimerFunc
+  double aux, speed = 0;
+  srand(time(NULL));
+  aux = fmod(interacoes, 15);
 
-    // Atualizar o alvo em movimento a cada 15 frames
-    double aux = fmod(interacoes, 15);
-    if (aux == 0.0) {
-        srand(time(NULL));
-        double deslocamento = ((double)rand() / RAND_MAX) * 2.0 - 1.0; // Gera um número aleatório entre -1 e 1
-        xtarget += (GLdouble)deslocamento;
+  // Movimenta o BB-8
+  if (aux == 0.0){
+    double deslocamento = ((double)rand() / RAND_MAX) * 2.0 - 1.0; // Gera -1, 0 ou 1
+    xtarget += (GLdouble)deslocamento;
 
-        // Se chegar próximo do limite da tela, volta para um pouco antes do limite
-        if (xtarget < -4.5) xtarget = -4.0;
-        if (xtarget > 4.5) xtarget = 4.0;
-    }
-
-    
-    // Atualizar posição do projétil
-    if (send) {
-        xdeslocBomb = xini + speedX * timeElapsed;
-        ydeslocBomb = yini - (0.5 * gravity * timeElapsed * timeElapsed);
-
-        // Verificar se o projétil saiu da tela
-        if (xdeslocBomb > 5.0 || ydeslocBomb < -5.0 || xdeslocBomb < -5.0) {
-            send = 0; // Reinicia o estado de lançamento
-        }
-
-        // Verifica se atingiu a cabeça do BB8, deslocBomb é adicionado com o raio do círculo que o fez
-        // target é adicionado com o raio da semielipse que fez a cabeça do  BB8, mas como escalonamos ele, escalonamos tambem o raio de 0.6 para 0.3
-        // ja a altura em y é escalonada de 0.7 para 0.35, depois adicionamos com a coordenada do proprio raio do BB8, pois a cabeça está acima dela
-        if (xdeslocBomb + 0.3 >= xtarget - 0.3  &&
-            xdeslocBomb - 0.3 <= xtarget + 0.3 &&
-            ydeslocBomb - 0.3 <= ytarget + 0.8 &&
-            ydeslocBomb + 0.3 >= ytarget + 0.55){
-            // Pausamos
-            paused = 1;
-            /* GLdouble aux = scaleBB8;
-            for (int c = 0; c < 20; c++){
-              sleep(1);
-              scaleBB8 -= aux/20;
-              glutPostRedisplay();
-            } */
-        }
-
-        // Verificar se o projétil atingiu o alvo, target é adicionado com o raio do BB8, mas como escalonamos ele, escalonamos tambem o raio de 1.1 para 0.55
-        // e reduzimos um pouco para 0.5 para melhores efeitos visuais
-        if (xdeslocBomb + 0.3 >= xtarget - 0.5 &&
-            xdeslocBomb - 0.3 <= xtarget + 0.5 && 
-            ydeslocBomb - 0.3 <= ytarget + 0.5 &&
-            ydeslocBomb + 0.3 >= ytarget - 0.5){
-            // Pausamos
-            paused = 1;
-            /* GLdouble aux = scaleBB8;
-            for (int c = 0; c < 20; c++){
-              sleep(1);
-              scaleBB8 -= aux/20;
-              glutPostRedisplay();
-            } */
-        } 
-    } 
-
-    glutPostRedisplay();
-    glutTimerFunc(30, Animar, interacoes + 1); // Reagendar animação
+    // Limita o movimento do BB-8 no eixo X
+    if (xtarget < -4.0) xtarget = -4.0;
+    if (xtarget > 4.0) xtarget = 4.0;
+    printf(">>> xtarget: %f\n", xtarget);
   }
 
-void display(void){
+  if (xini - lastX > 0){
+    speed = 0.1;
+  } else if (xini - lastX < 0){
+    speed = -0.1;
+    printf(">>> xpos: %f\n", xpos);
+    printf(">>> lastX: %f\n", lastX);
+  }
+
+  // Calcular o tempo decorrido desde o lançamento do projétil
+  clock_t currentTime = clock();
+  double timeElapsed = ((double)(currentTime - launchTime)) / CLOCKS_PER_SEC;
+
+  // Atualizar a posição do projétil
+  double x, y;
+  x = xini + 0.1 * timeElapsed;
+  y = yini - 9.81 * pow(timeElapsed, 2) / 2;
+
+  xdeslocBomb += x;
+  ydeslocBomb += y;
+
+  if (xdeslocBomb > 5.0 || ydeslocBomb < -5.0 || xdeslocBomb < -5.0){
+    send = 0;
+  }
+ 
+  // Solicita o redesenho da tela
+  glutPostRedisplay();
+  interacoes=interacoes+1;
+  glutTimerFunc(30,Animar,interacoes);
+}
+
+void display(void)
+{
   glClear(GL_COLOR_BUFFER_BIT); ////Limpa a janela de visualização com a cor de fundo especificada
 
   // Cria o terreno
@@ -1025,32 +960,8 @@ void display(void){
 
 
   glPushMatrix();
-    glTranslated(xtarget, ytarget, 0);
-    glScaled(scaleBB8, scaleBB8, 1.0);
-    // Hit Box de colisão do corpo do BB8, para efeitos de teste,
-    glColor3ub(255, 0, 0);
-    glBegin(GL_LINES);
-      glVertex2d(-1.1, 1.1);
-      glVertex2d(1.1, 1.1);
-      glVertex2d(1.1, 1.1);
-      glVertex2d(1.1, -1.1);
-      glVertex2d(1.1, -1.1);
-      glVertex2d(-1.1, -1.1);
-      glVertex2d(-1.1, -1.1);
-      glVertex2d(-1.1, 1.1);
-    glEnd();
-    // Hit Box da cabeça do BB8
-    glColor3ub(255, 0, 0);
-    glBegin(GL_LINES);
-      glVertex2d(-0.6, 1.1);
-      glVertex2d(0.6, 1.1);
-      glVertex2d(0.6, 1.1);
-      glVertex2d(0.6, 1.8);
-      glVertex2d(0.6, 1.8);
-      glVertex2d(-0.6, 1.8);
-      glVertex2d(-0.6, 1.8);
-      glVertex2d(-0.6, 1.1);
-    glEnd();
+    glTranslated(xtarget, -1.8, 0);
+    glScaled(0.5, 0.5, 1.0);
 
     criaBB8();
   glPopMatrix();
@@ -1059,31 +970,18 @@ void display(void){
   glPushMatrix();
     //glTranslated(xpos, ypos, 0);
 
-    glTranslated(xpos, ypos, 0);
+    glTranslated(3+xpos, 3+ypos, 0);
     glScaled(scale, scale, 1.0);
     
     criaTieFighter(0, 0);
   glPopMatrix();
 
+  glPushMatrix();
     if (send){
-      glPushMatrix();
-        glTranslated(xdeslocBomb,  ydeslocBomb, 0);
-          glColor3ub(0, 0, 255);
-          // Hit box de colisão para efeito de testes da bomba
-          glBegin(GL_LINES);
-            glVertex2d(-0.3, -0.3);
-            glVertex2d(0.3, -0.3);
-            glVertex2d(0.3, -0.3);
-            glVertex2d(0.3, 0.3);
-            glVertex2d(0.3, 0.3);
-            glVertex2d(-0.3, 0.3);
-            glVertex2d(-0.3, 0.3);
-            glVertex2d(-0.3, -0.3);
-          glEnd();
-
-          sendProjectile();
-      glPopMatrix();
+      glTranslated(3 + xdeslocBomb,  3 + ydeslocBomb, 0);
+        sendProjectile();
     }
+  glPopMatrix();
 
 
   //printf(">>> xpos: %lf >>> ypos: %lf >>> scale: %lf\n", xpos, ypos, scale);
@@ -1139,16 +1037,13 @@ void keyboard(unsigned char key, int x, int y){
       //glutPostRedisplay();
       break;
     case ' ':
-        if (paused) {
-          paused = 0; // Retomar o jogo
-        }else if (send == 0) {
-          xini = xpos;  // Captura a posição inicial da nave
-          yini = ypos - 0.9; // Define a posição vertical inicial do projétil
-          xdeslocBomb = xini;
-          ydeslocBomb = yini;
-          send = 1;
-          launchTime = glutGet(GLUT_ELAPSED_TIME) / 1000.0f; // Armazena o tempo do lançamento
-        }
+      if (send == 0){
+        // Lançar um projétil
+        xini = xdeslocBomb =  xpos;
+        yini = ydeslocBomb =  ypos;
+        send = 1;
+        launchTime = clock();
+      }
         break;
   }
   
@@ -1166,10 +1061,12 @@ void Special_keyboard(GLint tecla, int x, int y) {
       //glutPostRedisplay();
       break;
     case GLUT_KEY_LEFT:
+      lastX = xpos;
       xpos -= 0.1;
       //glutPostRedisplay();
       break;
     case GLUT_KEY_RIGHT:
+      lastX = xpos;
       xpos += 0.1;
       //glutPostRedisplay();
       break;

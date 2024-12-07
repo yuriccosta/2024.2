@@ -462,7 +462,7 @@ void display(void){
 
 
    //Cria nuvens
-  glColor3ub(115, 134, 129);
+  glColor3ub(185, 184, 189);
   criaNuvem(-0.8, 1.4, 0.5, 0.3);
   criaNuvem(-4, 1, 0.5, 0.45);
   criaNuvem(2.8, 0.5, 0.4, 0.3);
@@ -475,6 +475,15 @@ void display(void){
     glColor3ub(80,22,15);
     glVertex2d(-2.5, -0.3);
     glVertex2d(0.9, -0.3);
+  glEnd();
+
+  glColor3ub(90,22,15);
+  glBegin(GL_QUADS);
+    glVertex2d(-0.8, 0.8);
+    glVertex2d(-1.8, 0.8);
+    glColor3ub(80,22,15);
+    glVertex2d(-2.3, -0.2);
+    glVertex2d(0.7, -0.2);
   glEnd();
 
   criaTieFighter(3, 3);
